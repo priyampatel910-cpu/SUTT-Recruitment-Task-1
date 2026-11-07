@@ -31,6 +31,27 @@ def load_cabs_csv(csv_path):
 
                 return loaded_cabs
 
+            for line_number, cab_row in enumerate(csv_reader, start = 2):
+                try:
+                    driver_name = parse_name(cab_row["driver_name"])
+                    seat_count = parse_seats(cab_row["seats"])
+                    destination = parse_destination(cab_row["destination"])
+                    time_slot = parse_timeslot(cab_row["time_slot"])
+
+                    new_cab = Cab(
+                        driver_name,
+                        seat_count,
+                        destination,
+                        time_slot
+                    )
+
+                    loaded_cabs.append(new_cab)
+
+                except ValueError as error:
+                    print(
+                        f"Cab file line {line_number} skipped: {error}"
+                    )
+
     except FileNotFoundError:
         print(f"Could not find the file at {csv_path}")
 
