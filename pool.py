@@ -54,3 +54,37 @@ class CabPool:
         cab.board_and_leave(students)
 
         return students
+
+
+def preview_matches(pool):
+    claimed_count = {}
+    preview_results = []
+
+    for cab in pool.cabs:
+        if not cab.is_open:
+            continue
+
+        trip = cab.trip
+
+        ordered_student_list = pool.waiting_list_copy(trip)
+
+        start_idx = claimed_count.get(trip, 0)
+        end_idx = start_idx + cab.seats
+
+        cab_passengers = ordered_student_list[start_idx:end_idx]
+
+        claimed_count[trip] = (start_idx + len(cab_passengers))
+
+        preview_results.append(
+            (cab, cab_passengers)
+        )
+    
+    waitlist_by_trip = {}
+
+    for trip in ALL_TRIPS:
+        actual_waiting_count = pool.queue_size(trip)
+        preview_passenger_count = claimed_count.get(trip, 0)
+        waitlist_by_trip[trip] = actual_waiting_count - preview_passenger_count
+
+    return preview_results, waitlist_by_trip
+
