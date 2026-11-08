@@ -70,4 +70,21 @@ def show_everythin(pool):
 
             for passenger in cab.passengers:
                 print(f"-  {passenger.name}")
-                
+    
+    dispatch_result = pool.dispatch(trip)
+
+    if dispatch_result is None:
+        print("Dispatch could not be completed.")
+        return
+
+    departed_cab, boarded_students = dispatch_result
+
+    print("\nCab dispatched!")
+    print(departed_cab)
+
+    print("Students who boarded:")
+
+    for student in boarded_students:
+        print(f"- {student.name}")
+
+    print(f"{pool.queue_size{trip}} students are still waiting for this trip.")

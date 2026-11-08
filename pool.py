@@ -1,4 +1,5 @@
 from models import RideRequest, Cab
+import heapq
 
 ALL_TRIPS = {
     ("Delhi", "Morning"),
@@ -24,7 +25,16 @@ class CabPool:
         self.next_request_id+=1
         trip = new_request.trip
 
-        self.queues[trip].append(new_request)
+        priority_entry = (
+            -new_request.year,
+            new_request.request_id,
+            new_request
+        )
+
+        heapq.heappush(
+            self.queues[trip],
+            priority_entry
+        )
 
         return new_request
 
@@ -54,6 +64,17 @@ class CabPool:
         cab.board_and_leave(students)
 
         return students
+
+    def dispatch(self, trip):
+        cab = self.first_open_cab(trip)
+
+        if cab is None:
+            return None
+        
+        if self.queue_size(trip) == 0:
+            return None
+        
+        students = self.send_off()
 
 
 def preview_matches(pool):
