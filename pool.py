@@ -1,4 +1,4 @@
-from .models import RideRequest, Cab
+from models import RideRequest, Cab
 
 ALL_TRIPS = {
     ("Delhi", "Morning"),
