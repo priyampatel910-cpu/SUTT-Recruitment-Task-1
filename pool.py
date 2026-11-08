@@ -39,7 +39,10 @@ class CabPool:
         return new_request
 
     def waiting_list_copy(self, trip):
-        return self.queues[trip].copy()
+        
+        sorted_entries = sorted(self.queues[trip])
+        ordered_students = [entry[2] for entry in sorted_entries]
+        return ordered_students
 
     def queue_size(self, trip):
         return len(self.queues[trip])
@@ -51,9 +54,14 @@ class CabPool:
         return None
 
     def take_from_queue(self, trip, number_of_students):
-        waiting_students = self.queues[trip]
-        students_to_board = waiting_students[:number_of_students]
-        self.queues[trip] = waiting_students[number_of_students:]
+        students_to_board = []
+
+        while(len(students_to_board < number_of_students and len(self.queues[trip]) > 0)):
+            highest_priority_entry = heapq.heappop(self.queues[trip])
+
+            student_request = highest_priority_entry[2]
+
+            students_to_board.append(student_request)
 
         return students_to_board
 
