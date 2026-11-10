@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
 from models import Cab
+from pool import CabPool
 from validator import parse_name, parse_seats,parse_destination, parse_timeslot
 
 def load_cabs_csv(csv_path):

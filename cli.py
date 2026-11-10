@@ -1,6 +1,24 @@
 from validator import *
 
-def add_request_flow(pool):
+def ask_user(question, parser):
+    while True:
+        try:
+            user_input = input(question)
+
+        except(KeyboardInterrupt):
+            raise        
+
+        if user_input.strip().lower() == "cancel":
+            return None
+
+        try:
+            valideted_value = parser(user_input)
+            return valideted_value
+
+        except ValueError as error:
+            print(error)
+
+def add_request_cli(pool):
 
     questions = [
         ("Name: ", parse_name),
@@ -70,21 +88,130 @@ def show_everythin(pool):
 
             for passenger in cab.passengers:
                 print(f"-  {passenger.name}")
-    
-    dispatch_result = pool.dispatch(trip)
 
-    if dispatch_result is None:
-        print("Dispatch could not be completed.")
+def ordinal(number):
+    if 10 <= number%100 <= 20:
+        return "th"
+    return {1: "st", 2: "nd", 3: "rd"}.get(number%10, "th")
+    
+def find_matches_cli(pool):
+    preview_results, remaining_waiting = pool.preview_results()
+
+    print("\n======= Match Preview =======")
+
+    if not preview_results:
+        print("There are no open cabs.")
+
+    else:
+        for cab, students in preview_results:
+            print(f"\n{cab.driver_name} | {cab.destination} {cab.time_slot}")
+
+            if not students:
+                print("No students waiting for this cab.")
+                continue
+
+            for position, student in enumerate(students, start=1):
+                print(f"  {position}. {student.name} ({student.year}{ordinal(student.year)}) year")
+
+            empty_seats = cab.seats - len(students)
+
+            if empty_seats:
+                print(f"{empty_seats} would remain empty.")
+
+    print("\n======= Still Waiting for cabs =======")
+
+    for trip in ALL_TRIPS:
+        waiting_count = remaining_waiting[trip]
+        if waiting_count == 0:
+            continue
+
+        destination, time_slot = trip
+
+        if pool.first_open_cab is None:
+            status="no open cab"
+
+        else:
+            status="open cabs exist, but are full (in preview)"
+
+        print(f"{destination} {time_slot}: {waiting_count} students, {status}")
+
+    print("\nThis is a preview only, no cabs were added or removed from the csv file")
+
+
+def dispatch_cli(pool):
+    destination = ask_user("Destination(Jaipur/Delhi) : ", parse_destination)
+    if destination is None:
+        print("Dispatch cancelled.")
         return
 
-    departed_cab, boarded_students = dispatch_result
+    time_slot = ask_user("Time slot (Morning/Afternoon/Evening/Night): ", parse_timeslot)
+    if time_slot is None:
+        print("Dispatch cancelled"); return
 
-    print("\nCab dispatched!")
-    print(departed_cab)
+    trip = (destination, time_slot)
+    cab = pool.first_open_cab(trip)
 
-    print("Students who boarded:")
+    if cab is None:
+        print("No cabs available for this trip.")
+        return
 
-    for student in boarded_students:
-        print(f"- {student.name}")
+    waiting_count = pool.queue_size(trip)
+    if waiting_count == 0:
+        print("Nobody is waiting for this trip.")
+        return
 
-    print(f"{pool.queue_size{trip}} students are still waiting for this trip.")
+    boarding_count = min(cab.seats, waiting_count)
+
+    if boarding_count < cab.seats:
+        answer = input(
+            f"Only {boarding_count} of {cab.seats} will be filled. "
+            "Send this cab anyway? (y/n): "
+        ).strip().casefold()
+
+        if answer not in ("y", "yes"):
+            print("Dispatched cancelled.")
+            return
+
+        dispatch_result = pool.dispatch(trip)
+        if dispatch_result is None:
+            print("Disptach could not be completed.")
+            return
+
+        departed_cab, boarded_students = dispatch_result
+
+        print("\n Cab successfully dispatched.")
+        print(departed_cab)
+        print("Students who boarded:")
+        for student in boarded_students:
+            print(f"   -{student.name} (request #{student.request_id})")
+
+        print(f"{pool.queue_size(trip)} students remain waiting for this trip.")
+
+def run_menu(pool):
+    menu_actions = {
+        "1": add_request_cli(pool),
+        "2": show_everything(pool),
+        "3": find_matches_cli(pool),
+        "4": dispatch_cli(pool),
+    }
+
+    while True:
+        print("\n========== CAB POOL MATCHER ==========")
+        print("1. Add request")
+        print("2. View waiting students and cabs")
+        print("3. Find Matches (read-only preview)")
+        print("4. Dispatch Cab")
+        print("5. Quit")
+
+        choice = input("Choose an option: ").strip()
+
+        if choice == "5":
+            print("Exiting. Goodbye!")
+            return
+
+        selected_option = menu_actions.get(choice)
+
+        if selected_option is None:
+            print("Please enter a number from 1 to 5.")
+
+            continue
