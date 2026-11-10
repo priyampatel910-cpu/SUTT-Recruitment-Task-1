@@ -18,7 +18,7 @@ def load_cabs_csv(csv_path):
             if csv_reader.fieldnames is None:
                 print("The cab CSV file is empty.")
 
-            missing_colums = [
+            missing_columns = [
                 column for column in [
                     "driver_name",
                     "seats",

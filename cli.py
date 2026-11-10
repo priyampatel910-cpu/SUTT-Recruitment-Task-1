@@ -1,4 +1,5 @@
 from validator import *
+from pool import ALL_TRIPS
 
 def ask_user(question, parser):
     while True:
@@ -39,19 +40,19 @@ def add_request_cli(pool):
 
         answers.append(answer)
 
-        new_request = pool.add_request(
-            answers[0],
-            answers[1],
-            answers[2],
-            answers[3]
-        )
+    new_request = pool.add_new_request(
+        answers[0],
+        answers[1],
+        answers[2],
+        answers[3]
+    )
 
-        print(f"Added: {new_request}")
+    print(f"Added: {new_request}")
 
-        if pool.first_open_cab(new_request.trip) is None:
-            print("No open cab available for this trip. You have been added to the waiting list")
+    if pool.first_open_cab(new_request.trip) is None:
+        print("No open cab available for this trip. You have been added to the waiting list")
 
-def show_everythin(pool):
+def show_everything(pool):
     print("\n-=-=-=-=- WAITING -=-=-=-=-")
     someone_waiting = False
 
@@ -70,7 +71,7 @@ def show_everythin(pool):
             f"({len(waiting_students)} waiting)."
         )
 
-        for position, students in enumerate(waiting_students, start = 1):
+        for position, student in enumerate(waiting_students, start = 1):
             print(f"{position}. {student}")
     
     if not someone_waiting:
@@ -95,7 +96,7 @@ def ordinal(number):
     return {1: "st", 2: "nd", 3: "rd"}.get(number%10, "th")
     
 def find_matches_cli(pool):
-    preview_results, remaining_waiting = pool.preview_results()
+    preview_results, remaining_waiting = pool.preview_matches()
 
     print("\n======= Match Preview =======")
 
@@ -188,13 +189,7 @@ def dispatch_cli(pool):
         print(f"{pool.queue_size(trip)} students remain waiting for this trip.")
 
 def run_menu(pool):
-    menu_actions = {
-        "1": add_request_cli(pool),
-        "2": show_everything(pool),
-        "3": find_matches_cli(pool),
-        "4": dispatch_cli(pool),
-    }
-
+    
     while True:
         print("\n========== CAB POOL MATCHER ==========")
         print("1. Add request")
@@ -209,9 +204,18 @@ def run_menu(pool):
             print("Exiting. Goodbye!")
             return
 
-        selected_option = menu_actions.get(choice)
+        if choice == "1":
+            add_request_cli(pool)
 
-        if selected_option is None:
+        if choice == "2":
+            show_everything(pool)
+
+        if choice == "3":
+            find_matches_cli(pool)
+
+        if choice == "4":
+            dispatch_cli(pool)
+
+        else:
             print("Please enter a number from 1 to 5.")
-
             continue

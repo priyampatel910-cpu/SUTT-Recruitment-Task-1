@@ -1,5 +1,6 @@
 from models import RideRequest, Cab
 import heapq
+from validator import DESTINATIONS, TIME_SLOTS
 
 ALL_TRIPS = {
     (destination, time_slot)

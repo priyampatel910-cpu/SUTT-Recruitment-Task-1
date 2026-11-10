@@ -31,31 +31,31 @@ class Cab:
         self.has_left = False
         self.passengers = []
 
-        @property
-        def is_open(self):
-            return not self.has_left
+    @property
+    def is_open(self):
+        return not self.has_left
 
-        @property
-        def trip(self):
-            return (self.destination, self.time_slot)
+    @property
+    def trip(self):
+        return (self.destination, self.time_slot)
 
-        @property
-        def seats_taken(self):
-            return len(self.passengers)
+    @property
+    def seats_taken(self):
+        return len(self.passengers)
 
-        def board_and_leave(self, students):
-            if self.has_left:
-                raise ValueError("This cab is already left.")
+    def board_and_leave(self, students):
+        if self.has_left:
+            raise ValueError("This cab is already left.")
 
-            if len(students) > self.seats:
-                raise ValueError("More students assigned than available seats.")
+        if len(students) > self.seats:
+            raise ValueError("More students assigned than available seats.")
 
-            self.passengers = students
-            self.has_left = True
+        self.passengers = students
+        self.has_left = True
 
-        def __str__():
-            status = "LEFT" if self.has_left else "OPEN"
+    def __str__(self):
+        status = "LEFT" if self.has_left else "OPEN"
 
-            return (
-                f"{self.driver_name} | {self.destination} {self.time_slot} | {self.seats_taken}/{self.seats} | {status}"
-            )
+        return (
+            f"{self.driver_name} | {self.destination} {self.time_slot} | {self.seats_taken}/{self.seats} | {status}"
+        )
