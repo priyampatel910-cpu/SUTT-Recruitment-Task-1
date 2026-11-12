@@ -51,7 +51,7 @@ class CabPool:
     def take_from_queue(self, trip, number_of_students):
         students_to_board = []
 
-        while(len(students_to_board < number_of_students and len(self.queues[trip]) > 0)):
+        while(len(students_to_board) < number_of_students and len(self.queues[trip]) > 0):
             highest_priority_entry = heapq.heappop(self.queues[trip])
 
             student_request = highest_priority_entry[2]
@@ -76,7 +76,7 @@ class CabPool:
         if cab is None or self.queue_size(trip) == 0:
             return None
         
-        students = self.send_off()
+        students = self.send_off(cab)
         if not students:
             return None
 

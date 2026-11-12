@@ -77,7 +77,7 @@ def show_everything(pool):
     if not someone_waiting:
         print("Nobody is waiting.")
 
-    print("\n========== CABS ==========")
+    print("\n-=-=-=-=- CABS -=-=-=-=-")
     if len(pool.cabs) == 0:
         print("No cabs right now.")
 
@@ -98,7 +98,7 @@ def ordinal(number):
 def find_matches_cli(pool):
     preview_results, remaining_waiting = pool.preview_matches()
 
-    print("\n======= Match Preview =======")
+    print("\n-=-=-=-=- Match Preview -=-=-=-=-")
 
     if not preview_results:
         print("There are no open cabs.")
@@ -117,9 +117,9 @@ def find_matches_cli(pool):
             empty_seats = cab.seats - len(students)
 
             if empty_seats:
-                print(f"{empty_seats} would remain empty.")
+                print(f"{empty_seats} seats would remain empty.")
 
-    print("\n======= Still Waiting for cabs =======")
+    print("\n-=-=-=-=- Still Waiting for cabs -=-=-=-=-")
 
     for trip in ALL_TRIPS:
         waiting_count = remaining_waiting[trip]
